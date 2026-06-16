@@ -1,5 +1,12 @@
 FROM php:8.2-fpm
 
+ARG UID=1000
+ARG GID=1000
+
+RUN groupadd -g ${GID} appuser && \
+    useradd -u ${UID} -g appuser -m appuser
+
+USER appuser
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
     git \

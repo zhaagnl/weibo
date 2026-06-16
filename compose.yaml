@@ -1,5 +1,6 @@
 services:
   app:
+    user: "${UID:-1000}:${GID:-1000}"
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,6 +12,7 @@ services:
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - COMPOSER_HOME=/var/www/.composer
     networks:
       - laravel
 
