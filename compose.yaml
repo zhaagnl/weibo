@@ -9,10 +9,12 @@ services:
     working_dir: /var/www
     volumes:
       - .:/var/www
+      - ./.psysh:/tmp/.psysh
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
       - COMPOSER_HOME=/var/www/.composer
+      - XDG_CONFIG_HOME=/tmp
     networks:
       - laravel
 

@@ -33,6 +33,9 @@ COPY . /var/www
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
+# tinker创建有权限的目录
+RUN mkdir -p /tmp/.psysh && chmod 777 /tmp/.psysh
+
 # 暴露端口（PHP-FPM 默认 9000）
 EXPOSE 9000
 
