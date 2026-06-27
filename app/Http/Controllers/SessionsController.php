@@ -19,7 +19,7 @@ class SessionsController extends Controller
             'password' => 'required'
         ]);
         // Auth::attempt() 方法会接收一个包含用户凭证的数组作为参数，并尝试使用这些凭证来验证用户。如果验证成功，用户将被登录，并且方法返回 true；如果验证失败，方法返回 false。
-        if(Auth::attempt($credentials)){
+        if(Auth::attempt($credentials,$request->has('remember'))){
             session()->flash('success', '欢迎回来！');
             // Auth::user() 方法用于获取当前经过身份验证的用户实例。它返回一个表示当前登录用户的 User 模型对象。通过调用 Auth::user()，你可以访问当前登录用户的属性和方法，例如获取用户的 ID、姓名、邮箱等信息。
             return redirect()->route('users.show', [Auth::user()]);
