@@ -4,9 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class UsersController extends Controller
 {
+    public function __construct()
+    {
+        // 除了['show', 'create','store']以外的所有方法都需要登录才能访问
+        $this->middleware('auth',[
+            // except 除了...以外，黑名单方式，推荐使用！only 只允许...，白名单方式
+            'except' => ['show', 'create','store']
+        ]);
+        
+        // 只允许未登录用户访问注册页面，已登录用户访问注册页面会被重定向到首页
+        $this->middleware('guest',[
+            'only' => ['create']
+        ]);
+    }
+
     public function create()
     {
         return view('users.create');
@@ -43,11 +59,13 @@ class UsersController extends Controller
 
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
         return view('users.edit',compact('user'));
     }
 
     public function update(User $user, Request $request)
     {
+        $this->authorize('update', $user);
         $this->validate($request, [
             'name' => 'required|max:50',
             'password' => 'nullable|confirmed|min:6'
@@ -55,9 +73,21 @@ class UsersController extends Controller
 
         $data = [];
         $data['name'] = $request->name;
-        if($request->password) {
+        // 空字符串验证不了
+        // if($request->password) {
+        //     $data['password'] = bcrypt($request->password);
+        // }
+
+        // 方法一：使用filled()判断字段存在且不为空(排除null和空字符串)
+        // if($request->filled('password')){
+        //     $data['password'] = bcrypt($request->password);
+        // }
+
+        // 方法二：更严格，连空格也排除
+        if($request->has('password') && trim($request->password) !== ''){
             $data['password'] = bcrypt($request->password);
         }
+
         $user->update($data);
 
         session()->flash('success', '个人资料更新成功！');

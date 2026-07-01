@@ -7,6 +7,14 @@ use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
+    public function __construct()
+    {
+        // 只允许未登录用户访问登录页面，已登录用户访问登录页面会被重定向到首页
+        $this->middleware('guest',[
+            'only' => ['create']
+        ]);
+    }
+
     public function create()
     {
         return view('sessions.create');
@@ -22,7 +30,8 @@ class SessionsController extends Controller
         if(Auth::attempt($credentials,$request->has('remember'))){
             session()->flash('success', '欢迎回来！');
             // Auth::user() 方法用于获取当前经过身份验证的用户实例。它返回一个表示当前登录用户的 User 模型对象。通过调用 Auth::user()，你可以访问当前登录用户的属性和方法，例如获取用户的 ID、姓名、邮箱等信息。
-            return redirect()->route('users.show', [Auth::user()]);
+            $fallback = route('users.show', [Auth::user()]);
+            return redirect()->intended($fallback);
         }else{
             session()->flash('danger', '很抱歉，您的邮箱和密码不匹配');
             // back() 方法用于生成一个重定向响应，指示浏览器返回到上一个请求的 URL。它通常用于在表单提交失败或验证错误时，将用户重定向回原来的页面，以便他们可以重新填写表单或查看错误消息。
