@@ -105,4 +105,13 @@ class UsersController extends Controller
 
         return view('users.index',compact('users'));
     }
+
+    public function destroy(User $user)
+    {
+        // authorize()方法用于进行授权检查，它会根据指定的策略方法来判断当前用户是否有权限执行某个操作。在这里，$this->authorize('destroy', $user)表示调用UserPolicy中的destroy方法，检查当前登录用户是否有权限删除指定的$user实例。
+        $this->authorize('destroy', $user);
+        $user->delete();
+        session()->flash('success', '成功删除用户！');
+        return back();
+    }
 }
