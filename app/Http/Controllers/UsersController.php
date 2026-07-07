@@ -14,7 +14,7 @@ class UsersController extends Controller
         // 除了['show', 'create','store']以外的所有方法都需要登录才能访问
         $this->middleware('auth',[
             // except 除了...以外，黑名单方式，推荐使用！only 只允许...，白名单方式
-            'except' => ['show', 'create','store']
+            'except' => ['show', 'create','store','index']
         ]);
         
         // 只允许未登录用户访问注册页面，已登录用户访问注册页面会被重定向到首页
@@ -94,5 +94,13 @@ class UsersController extends Controller
 
         return redirect()->route('users.show', $user);
         
+    }
+
+    public function index()
+    {
+        $users = User::all();
+        // compact()函数用于将变量打包成一个数组，这样可以方便地将数据传递给视图。在这里，compact('users')会创建一个包含'users'键的数组，其值为$users变量的值。
+
+        return view('users.index',compact('users'));
     }
 }
