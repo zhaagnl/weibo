@@ -98,7 +98,9 @@ class UsersController extends Controller
 
     public function index()
     {
-        $users = User::all();
+        // $users = User::all();
+        // paginate()方法用于对查询结果进行分页处理，它会根据指定的每页记录数，将查询结果分割成多个页面，并返回当前页面的数据。在这里，User::paginate(6)表示每页显示6条用户记录，并返回当前页的用户数据集合。
+        $users = User::paginate(6);
         // compact()函数用于将变量打包成一个数组，这样可以方便地将数据传递给视图。在这里，compact('users')会创建一个包含'users'键的数组，其值为$users变量的值。
 
         return view('users.index',compact('users'));
