@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 
 class UsersController extends Controller
@@ -14,9 +15,9 @@ class UsersController extends Controller
         // 除了['show', 'create','store']以外的所有方法都需要登录才能访问
         $this->middleware('auth',[
             // except 除了...以外，黑名单方式，推荐使用！only 只允许...，白名单方式
-            'except' => ['show', 'create','store','index']
+            'except' => ['show', 'create','store','index','confirmEmail']
         ]);
-        
+
         // 只允许未登录用户访问注册页面，已登录用户访问注册页面会被重定向到首页
         $this->middleware('guest',[
             'only' => ['create']
@@ -34,7 +35,7 @@ class UsersController extends Controller
     }
 
     public function store(Request $request)
-    {   
+    {
         // validate数据验证
         $this->validate($request,[
             'name' => 'required|unique:users|max:50',
@@ -49,11 +50,17 @@ class UsersController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
+        // 注册后直接登录操作
         // auth::login() 方法用于在用户注册成功后，自动将新注册的用户登录到系统中。它接收一个用户实例作为参数，并将该用户标记为已认证状态，从而允许用户在注册后立即访问受保护的资源，而无需再次输入凭证。
-        Auth::login($user);
+        // Auth::login($user);
         // session->flash()方法用于在会话中存储一条临时消息，这条消息只会在下一次请求中可用，之后就会被删除。这里的'success'是消息的类型，'欢迎，您将在这里开启一段新的旅程~'是具体的消息内容。
-        session()->flash('success','欢迎，您将在这里开启一段新的旅程~');
-        return redirect()->route('users.show',[$user]); 
+        // session()->flash('success','欢迎，您将在这里开启一段新的旅程~');
+        // return redirect()->route('users.show',[$user]);
+
+        // 添加邮件激活验证
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success', '验证邮件以发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
 
     }
 
@@ -73,15 +80,6 @@ class UsersController extends Controller
 
         $data = [];
         $data['name'] = $request->name;
-        // 空字符串验证不了
-        // if($request->password) {
-        //     $data['password'] = bcrypt($request->password);
-        // }
-
-        // 方法一：使用filled()判断字段存在且不为空(排除null和空字符串)
-        // if($request->filled('password')){
-        //     $data['password'] = bcrypt($request->password);
-        // }
 
         // 方法二：更严格，连空格也排除
         if($request->has('password') && trim($request->password) !== ''){
@@ -93,7 +91,7 @@ class UsersController extends Controller
         session()->flash('success', '个人资料更新成功！');
 
         return redirect()->route('users.show', $user);
-        
+
     }
 
     public function index()
@@ -114,4 +112,52 @@ class UsersController extends Controller
         session()->flash('success', '成功删除用户！');
         return back();
     }
+
+    // 发送邮件激活验证
+    public function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'zslemail@qq.com';
+        $name = 'MrZhang';
+        $to = $user->email;
+        $subject = "感谢注册 Weibo 应用！请确认你的邮箱。";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject){
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    // 处理邮箱激活逻辑
+    public function confirmEmail($token)
+    {
+        // firstOrFail() 方法用于从数据库中检索与给定条件匹配的第一条记录。如果找不到匹配的记录，它会抛出一个 ModelNotFoundException 异常，从而触发 404 错误页面。这在处理用户激活链接时非常有用，因为如果提供的激活令牌无效或不存在，应用程序会返回一个适当的错误响应，而不是继续执行后续操作。
+        $user = User::where('activation_token', $token)->firstOrFail();
+        // activated属性用于表示用户是否已激活。在这里，$user->activated = true;将用户的激活状态设置为已激活，表示该用户已经完成了邮箱验证过程。
+        $user->activated = true;
+        // activation_token属性用于存储用户的激活令牌。在这里，$user->activation_token = null;将激活令牌设置为null，表示该用户的激活过程已经完成，不再需要使用该令牌进行验证。
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', '恭喜你，激活成功！');
+        return redirect()->route('users.show', [$user]);
+    }
+
+    // 显示“未收到邮件？”的页面
+    public function showConfirmForm()
+    {
+        return view('auth.confirm-notice');
+    }
+
+    // 处理重新发送激活邮件请求
+    public function resendConfirmEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+    }
+
 }

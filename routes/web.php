@@ -28,7 +28,12 @@ Route::get('login', 'SessionsController@create')->name('login');
 Route::post('login', 'SessionsController@store')->name('login');
 Route::delete('logout', 'SessionsController@destroy')->name('logout');
 
-
+// 邮箱确认路由
+Route::get('signup/confirm/{token}', 'UsersController@confirmEmail')->name('confirm_email');
+// 显示“请检查邮箱”页面
+Route::get('signup/confirm', 'UsersController@showConfirmForm')->name('confirm.notice');
+// 重新发送激活邮件
+Route::get('signup/confirm/resend', 'UsersController@resendConfirmEmail')->name('confirm.resend');
 
 // Auth::routes();
 

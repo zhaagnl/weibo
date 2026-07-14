@@ -28,11 +28,17 @@ class SessionsController extends Controller
         ]);
         // Auth::attempt() 方法会接收一个包含用户凭证的数组作为参数，并尝试使用这些凭证来验证用户。如果验证成功，用户将被登录，并且方法返回 true；如果验证失败，方法返回 false。
         if(Auth::attempt($credentials,$request->has('remember'))){
-            session()->flash('success', '欢迎回来！');
-            // Auth::user() 方法用于获取当前经过身份验证的用户实例。它返回一个表示当前登录用户的 User 模型对象。通过调用 Auth::user()，你可以访问当前登录用户的属性和方法，例如获取用户的 ID、姓名、邮箱等信息。
-            $fallback = route('users.show', [Auth::user()]);
-            // intended() 方法用于在用户登录后，将他们重定向到他们最初尝试访问的页面。如果用户在登录前尝试访问一个受保护的路由，Laravel 会将该路由的 URL 存储在会话中。当用户成功登录后，intended() 方法会检查会话中是否存在该 URL，并将用户重定向到该 URL。如果没有存储的 URL，则会使用提供的备用 URL 作为重定向目标。
-            return redirect()->intended($fallback);
+            if(Auth::user()->activated){
+                session()->flash('success', '欢迎回来！');
+                // Auth::user() 方法用于获取当前经过身份验证的用户实例。它返回一个表示当前登录用户的 User 模型对象。通过调用 Auth::user()，你可以访问当前登录用户的属性和方法，例如获取用户的 ID、姓名、邮箱等信息。
+                $fallback = route('users.show', [Auth::user()]);
+                // intended() 方法用于在用户登录后，将他们重定向到他们最初尝试访问的页面。如果用户在登录前尝试访问一个受保护的路由，Laravel 会将该路由的 URL 存储在会话中。当用户成功登录后，intended() 方法会检查会话中是否存在该 URL，并将用户重定向到该 URL。如果没有存储的 URL，则会使用提供的备用 URL 作为重定向目标。
+                return redirect()->intended($fallback);
+            }else{
+                Auth::logout();
+                session()->flash('warning', '你的账号未激活，请检查邮箱中的注册邮件进行激活。');
+                return redirect('/');
+            }
         }else{
             session()->flash('danger', '很抱歉，您的邮箱和密码不匹配');
             // back() 方法用于生成一个重定向响应，指示浏览器返回到上一个请求的 URL。它通常用于在表单提交失败或验证错误时，将用户重定向回原来的页面，以便他们可以重新填写表单或查看错误消息。
