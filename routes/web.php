@@ -30,10 +30,17 @@ Route::delete('logout', 'SessionsController@destroy')->name('logout');
 
 // 邮箱确认路由
 Route::get('signup/confirm/{token}', 'UsersController@confirmEmail')->name('confirm_email');
-// 显示“请检查邮箱”页面
-Route::get('signup/confirm', 'UsersController@showConfirmForm')->name('confirm.notice');
-// 重新发送激活邮件
-Route::get('signup/confirm/resend', 'UsersController@resendConfirmEmail')->name('confirm.resend');
+
+// 填写Email的表单
+Route::get('password/reset', 'PasswordController@showLinkRequestForm')->name('password.request');
+//  处理表单提交，成功的话就发送邮件，附带Token链接
+Route::post('password/email', 'PasswordController@sendResetLinkEmail')->name('password.email');
+
+// 显示更新密码的表单，包含token
+Route::get('password/reset/{token}', 'PasswordController@showResetForm')->name('password.reset');
+// 对提交过来的token和Email数据进行配对，正确的话更新密码
+Route::post('password/reset', 'PasswordController@reset')->name('password.update');
+
 
 // Auth::routes();
 

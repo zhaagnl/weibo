@@ -19,7 +19,7 @@
                 </div>
 
                 <div class="from-group">
-                    <label for="password">密码：</label>
+                    <label for="password">密码（<a href="{{ route('password.request') }}">忘记密码</a>）：</label>
                     <input type="password" name="password" class="form-control" value="{{old('password')}}">
                 </div>
 
@@ -29,11 +29,11 @@
                         <label class="form-check-label" for="exampleCheck1">记住我</label>
                     </div>
                 </div>
-                
-                <button type="submit" class="btn btn-primary">登录</button>
-            </form>
 
-            <hr>
+                <button type="submit" class="btn btn-primary">登录</button>
+              </form>
+
+              <hr>
 
             <p>还没有账号？<a href="{{route('signup')}}">现在注册！</a></p>
         </div>

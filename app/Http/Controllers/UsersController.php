@@ -144,20 +144,6 @@ class UsersController extends Controller
         return redirect()->route('users.show', [$user]);
     }
 
-    // 显示“未收到邮件？”的页面
-    public function showConfirmForm()
-    {
-        return view('auth.confirm-notice');
-    }
 
-    // 处理重新发送激活邮件请求
-    public function resendConfirmEmail(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-    }
 
 }

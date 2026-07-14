@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@section('title', '重置密码')
 
 @section('content')
 <div class="container">
@@ -17,11 +18,17 @@
                     <form method="POST" action="{{ route('password.email') }}">
                         @csrf
 
-                        <div class="row mb-3">
+                        <div class="row mb-3{{ $errors->has('email') ? 'has-error' : '' }}">
                             <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
 
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+
+                                @if ($errors->has('email'))
+                                  <span class="form-text">
+                                    <strong>{{ $errors->first('email') }}</strong>
+                                  </span>
+                                @endif
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
