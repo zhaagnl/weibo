@@ -13,6 +13,11 @@ class SessionsController extends Controller
         $this->middleware('guest',[
             'only' => ['create']
         ]);
+
+        // 限流10分钟十次
+        $this->middleware('throttle:10,10',[
+            'only' => ['store']
+        ]);
     }
 
     public function create()
@@ -45,7 +50,7 @@ class SessionsController extends Controller
             // withInput() 方法用于在重定向时将用户输入的数据保存在会话中，以便在下次请求时可以重新填充表单字段。它通常与表单验证失败的情况一起使用，以便用户不必重新输入所有数据。
             return redirect()->back()->withInput();
         }
-       
+
     }
 
     public function destroy()
