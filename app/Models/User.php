@@ -51,7 +51,7 @@ class User extends Authenticatable
     }
 
     public static function boot()
-    {   
+    {
         //parent::boot()方法用于调用父类的boot方法，确保在子类中也能继承和执行父类的初始化逻辑。在这里，它确保了User模型在创建新用户实例时，仍然会执行父类Authenticatable中的初始化逻辑。
         parent::boot();
         // static::creating()方法用于在创建新用户实例之前执行一个回调函数。在这里，它会在用户创建时生成一个随机的激活令牌，并将其赋值给activation_token属性。这是为了实现用户注册后的邮箱验证功能，确保每个新用户都有一个唯一的激活令牌。

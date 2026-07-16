@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.default')
 @section('title', '重置密码')
 
 @section('content')
@@ -24,11 +24,11 @@
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
-                                @if ($errors->has('email'))
+                                {{-- @if ($errors->has('email'))
                                   <span class="form-text">
                                     <strong>{{ $errors->first('email') }}</strong>
                                   </span>
-                                @endif
+                                @endif --}}
 
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">

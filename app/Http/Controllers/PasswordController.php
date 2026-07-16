@@ -39,17 +39,24 @@ class PasswordController extends Controller
         // 3.如果不存在
         if(is_null($user)){
             session()->flash('danger', '邮箱未注册 ');
+            // withInput()把当前请求的所有输入数据（$request->all()）一次性闪存到 Session 中，键名为 _old_input
             return redirect()->back()->withInput();
         }
 
         // 4.生成token，会在视图 emails.reset_link 里拼接链接
+        // Str::random(40)：随机生成一个 40 字符的随机字符串。
+        // config('app.key')：读取 config/app.php 中的 key 值（即 APP_KEY，用于加密/哈希）。
+        // hash_hmac('sha256', ..., ...)：使用 HMAC-SHA256 算法，将随机字符串与 app.key 混合哈希，生成一个更安全、不可猜测的令牌。
         $token = hash_hmac('sha256', Str::random(40), config('app.key'));
 
         // 5.入库， 使用 updateOrInsert 来保持 Email 唯一
         DB::table('password_resets')->updateOrInsert(['email' => $email],
         [
             'email' => $email,
+            // 对令牌进行 bcrypt 哈希（默认使用 bcrypt 算法），然后存入数据库。
+            // 注意：这里存储的是令牌的哈希值，而不是原始令牌。用户收到的邮件里是原始 $token，验证时需要把用户提交的令牌用 Hash::check() 与库里的哈希值比对。
             'token' => Hash::make($token),
+            // 记录令牌生成时间（Carbon 是 Laravel 的日期时间类），可用于判断令牌是否过期。
             'created_at' => new Carbon,
         ]);
 
@@ -66,6 +73,7 @@ class PasswordController extends Controller
 
     public function showResetForm(Request $request)
     {
+        //  $request->route()获取当前匹配成功的路由对象;->parameter('token')：从该路由中提取名为 token 的 URL 参数
         $token = $request->route()->parameter('token');
         return view('auth.passwords.reset', compact('token'));
     }

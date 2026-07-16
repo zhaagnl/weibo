@@ -14,6 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
+            // nullable()数据可以为空
             $table->string('activation_token')->nullable();
             $table->boolean('activated')->default(false);
         });
