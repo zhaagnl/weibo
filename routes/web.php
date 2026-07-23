@@ -44,7 +44,8 @@ Route::post('password/reset', 'PasswordController@reset')->name('password.update
 // 微博的创建和删除
 Route::resource('statuses', 'StatusesController',['only' => ['store', 'destroy']]);
 
-
+Route::get('/users/{user}/followings', 'UsersController@followings')->name('users.followings');
+Route::get('/users/{user}/followers', 'UsersController@followers')->name('users.followers');
 // Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
