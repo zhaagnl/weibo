@@ -44,8 +44,21 @@ Route::post('password/reset', 'PasswordController@reset')->name('password.update
 // 微博的创建和删除
 Route::resource('statuses', 'StatusesController',['only' => ['store', 'destroy']]);
 
+// 关注的人列表
 Route::get('/users/{user}/followings', 'UsersController@followings')->name('users.followings');
+// 粉丝列表
 Route::get('/users/{user}/followers', 'UsersController@followers')->name('users.followers');
+
+// 关注用户
+Route::post('/users/followers/{user}', 'FollowersController@store')->name('followers.store');
+// 取消关注
+Route::delete('/users/followers/{user}', 'FollowersController@destroy')->name('followers.destroy');
+
+
+
+
+
+
 // Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
