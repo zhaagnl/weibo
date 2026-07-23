@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
         // call()方法用于调用其他的Seeder类，这样可以将多个Seeder类组合在一起执行。在这里，$this->call(UsersTableSeeder::class)表示调用UsersTableSeeder类来执行用户数据的填充操作。
         $this->call(UsersTableSeeder::class);
         $this->call(StatusesTableSeeder::class);
+        $this->call(FollowersTableSeeder::class);
+        
         // reguard()方法用于重新启用批量赋值保护机制，确保在填充操作完成后，模型的安全性得到恢复。
         Model::reguard();
     }

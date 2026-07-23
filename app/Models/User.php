@@ -73,7 +73,7 @@ class User extends Authenticatable
     // (被关注者)获取粉丝关系列表
     public function followers()
     {
-        return $this->brlongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
     }
     // (粉丝)获取用户关注人列表
     public function followings()
